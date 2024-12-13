@@ -16,6 +16,7 @@ if sys.version_info < (3, 10):
     from importlib_metadata import entry_points
 else:
     from importlib.metadata import entry_points
+from importlib import import_module
 
 # optional
 try:
@@ -278,6 +279,7 @@ class ErrorReporter:
             t.report()
 
 
+
 # error reporting setup (by extras or by module path)
 if Conf.ERROR_REPORTER:
     error_conf = deepcopy(Conf.ERROR_REPORTER)
@@ -292,8 +294,9 @@ if Conf.ERROR_REPORTER:
                 reporters.append(Reporter(**conf))
             # if no reporters were found, assume the user uses a class directly by module path
             if len(entries) == 0:
-                module = name
-                Reporter = getattr(sys.modules[module], name)
+                module_path, class_name = name.rsplit(".", 1)
+                module = import_module(module_path)
+                Reporter = getattr(module, class_name)
                 reporters.append(Reporter(**conf))
         error_reporter = ErrorReporter(reporters)
     except ImportError:
