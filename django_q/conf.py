@@ -279,7 +279,6 @@ class ErrorReporter:
             t.report()
 
 
-
 # error reporting setup (by extras or by module path)
 if Conf.ERROR_REPORTER:
     error_conf = deepcopy(Conf.ERROR_REPORTER)
