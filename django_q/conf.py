@@ -278,7 +278,7 @@ class ErrorReporter:
             t.report()
 
 
-# error reporting setup (sentry or rollbar)
+# error reporting setup (by extras or by module path)
 if Conf.ERROR_REPORTER:
     error_conf = deepcopy(Conf.ERROR_REPORTER)
     try:
@@ -286,8 +286,14 @@ if Conf.ERROR_REPORTER:
         # iterate through the configured error reporters,
         # and instantiate an ErrorReporter using the provided config
         for name, conf in error_conf.items():
-            for entry in entry_points(group="djangoq.errorreporters", name=name):
+            entries = entry_points(group="djangoq.errorreporters", name=name)
+            for entry in entries:
                 Reporter = entry.load()
+                reporters.append(Reporter(**conf))
+            # if no reporters were found, assume the user uses a class directly by module path
+            if len(entries) == 0:
+                module = name
+                Reporter = getattr(sys.modules[module], name)
                 reporters.append(Reporter(**conf))
         error_reporter = ErrorReporter(reporters)
     except ImportError:
