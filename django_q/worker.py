@@ -97,7 +97,7 @@ def worker(
         timeout_error = False
         try:
             if f is None:
-                # raise a meaningfull error if task["func"] is not a valid function
+                # raise a meaningfuell error if task["func"] is not a valid function
                 raise ValueError(f"Function {task['func']} is not defined")
             with TimeoutHandler(timer_value):
                 res = f(*task["args"], **task["kwargs"])
@@ -106,6 +106,8 @@ def worker(
             if isinstance(e, TimeoutException):
                 timeout_error = True
             result = (f"{e} : {traceback.format_exc()}", False)
+            print("hello from worker error reporting")
+            print(error_reporter)
             if error_reporter:
                 error_reporter.report()
             if task.get("sync", False):
